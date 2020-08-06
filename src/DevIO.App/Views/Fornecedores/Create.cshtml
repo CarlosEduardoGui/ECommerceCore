@@ -26,7 +26,7 @@
             <div class="form-group">
                 <label asp-for="TipoFornecedor" class="control-label"></label>
                 <input type="radio" value="1" asp-for="TipoFornecedor" checked />Pessoa Física<br />
-                <input type="radio" value="1" asp-for="TipoFornecedor"/>Pessoa Jurídica
+                <input type="radio" value="1" asp-for="TipoFornecedor" />Pessoa Jurídica
             </div>
 
 
@@ -50,4 +50,8 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        BuscaCEP();
+    </script>
 }
