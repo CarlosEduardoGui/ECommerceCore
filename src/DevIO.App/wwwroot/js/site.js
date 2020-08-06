@@ -1,4 +1,46 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿function AjaxModal() {
 
-// Write your JavaScript code.
+    jQuery(document).ready(function () {
+
+        jQuery(function () {
+
+            jQuery.ajaxSetup({ cache: false });
+
+            jQuery("a[data-modal]").on("click",
+                function (e) {
+                    jQuery('#myModalContent').load(this.href,
+                        function () {
+                            jQuery('#myModal').modal({
+                                keyboard: true
+                            },
+                                'show');
+                            bindForm(this);
+                        });
+
+                    return false;
+                });
+        });
+
+        function bindForm(dialog) {
+            jQuery('form', dialog).submit(function () {
+
+                jQuery.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: jQuery(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            jQuery('#myModal').modal('hide');
+                            jQuery('#EnderecoTarget').load(result.url);
+                        } else {
+                            jQuery('#myModalContent').html(result);
+                            bindForm(dialog);
+                        }
+                    }
+                });
+
+                return false;
+            });
+        }
+    });
+}

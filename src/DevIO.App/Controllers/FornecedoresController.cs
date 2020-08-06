@@ -6,18 +6,21 @@ using DevIO.App.ViewModels;
 using DevIO.Business.Interfaces;
 using AutoMapper;
 using DevIO.Business.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DevIO.App.Controllers
 {
     public class FornecedoresController : BaseController
     {
         private readonly IFornecedorRepository _fornecedorRepository;
+        private readonly IEnderecoRepository _enderecoRepository;
         private readonly IMapper _mapper;
 
 
-        public FornecedoresController(IFornecedorRepository context, IMapper mapper)
+        public FornecedoresController(IFornecedorRepository context, IMapper mapper, IEnderecoRepository endereco)
         {
             _fornecedorRepository = context;
+            _enderecoRepository = endereco;
             _mapper = mapper;
         }
 
@@ -117,6 +120,43 @@ namespace DevIO.App.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+
+        public async Task<IActionResult> AtualizarEndereco(Guid id)
+        {
+            var fornecedor = await ObterFornecedorEndereco(id);
+
+            if (fornecedor == null) return NotFound();
+
+            return PartialView("_AtualizarEnderecoPartial", new FornecedorViewModel { Endereco = fornecedor.Endereco });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AtualizarEndereco(FornecedorViewModel fornecedorViewModel)
+        {
+            ModelState.Remove("Nome");
+            ModelState.Remove("Documento");
+
+            if (!ModelState.IsValid) return PartialView("_AtualizarEnderecoPartial", fornecedorViewModel);
+
+            await _enderecoRepository.Atualizar(_mapper.Map<Endereco>(fornecedorViewModel.Endereco));
+
+            var url = Url.Action(nameof(ObterEndereco), "Fornecedores", new { id = fornecedorViewModel.Endereco.FornecedorId });
+
+            return Json(new { success = true, url });
+        }
+
+
+        public async Task<IActionResult> ObterEndereco(Guid id) 
+        {
+            var fornecedor = await ObterFornecedorEndereco(id);
+
+            if (fornecedor is null) return NotFound();
+
+            return PartialView("_DetalhesEnderecoPartial", fornecedor);
+        }
+
 
 
         private async Task<FornecedorViewModel> ObterFornecedorEndereco(Guid id)
