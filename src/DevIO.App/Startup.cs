@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using DevIO.Data.Context;
 using AutoMapper;
 using DevIO.App.Configuration;
+using DevIO.App.Data;
 
 namespace DevIO.App
 {
@@ -34,9 +35,8 @@ namespace DevIO.App
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ECommerceCoreDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddAutoMapper(typeof(Startup));
 
