@@ -61,8 +61,8 @@
                     @Html.DisplayFor(model => model.Endereco.Estado)
                 </td>
                 <td>
-                    <a asp-action="AtualizarEndereco" asp-route-id="@Model.Id" class="btn btn-info" data-modal="">
-                        <span title="Editar" class="fa fa-pencil-alt"></span>
+                    <a supress-by-action="Edit,ObterEndereco" asp-action="AtualizarEndereco" asp-route-id="@Model.Id" class="btn btn-info" data-modal="">
+                        <span title="Editar" class="fa fa-pencil-alt"></span> @* supress-by-action, se ele estiver sendo exibido em outro lugar que não seja pelo "Edit" não vai exibir o botão*@
                     </a>
                 </td>
             </tr>
