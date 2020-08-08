@@ -64,6 +64,9 @@ namespace DevIO.App.Controllers
 
             await _fornecedorService.Adicionar(fornecedor);
 
+            if (!OperacaoValida())
+                return View(fornecedorViewModel);
+
             return RedirectToAction(nameof(Index));
 
         }
@@ -97,6 +100,9 @@ namespace DevIO.App.Controllers
 
             await _fornecedorService.Atualizar(fornecedor);
 
+            if (!OperacaoValida())
+                return View(await ObterFornecedorProdutosEndereco(id));
+
             return RedirectToAction(nameof(Index));
 
         }
@@ -126,6 +132,9 @@ namespace DevIO.App.Controllers
 
             await _fornecedorService.Remover(id);
 
+            if (!OperacaoValida())
+                return View(fornecedorViewModel);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -152,6 +161,9 @@ namespace DevIO.App.Controllers
                 return PartialView("_AtualizarEnderecoPartial", fornecedorViewModel);
 
             await _fornecedorService.AtualizarEndereco(_mapper.Map<Endereco>(fornecedorViewModel.Endereco));
+
+            if (!OperacaoValida())
+                return PartialView("_AtualizarEnderecoPartial", fornecedorViewModel);
 
             var url = Url.Action(nameof(ObterEndereco), "Fornecedores", new { id = fornecedorViewModel.Endereco.FornecedorId });
 

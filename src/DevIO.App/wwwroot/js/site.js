@@ -109,3 +109,8 @@ function BuscaCEP() {
         });
     });
 }
+
+
+jQuery(document).ready(function (){
+    jQuery("#msg_box").fadeOut(2500);
+});

@@ -19,7 +19,7 @@ namespace DevIO.App.Configurations
             services.AddScoped<IEnderecoRepository, EnderecoRepository>();
             services.AddSingleton<IValidationAttributeAdapterProvider, MoedaValidationAttributeAdapterProvider>();
 
-            services.AddScoped<INotificador, Notificador>();
+            services.AddScoped<INotificador, Notificador>();  //Deixa a mesma instância, ou seja, ele mantem em memória
             services.AddScoped<IFornecedorService, FornecedorService>();
             services.AddScoped<IProdutoService, ProdutoService>();
 
