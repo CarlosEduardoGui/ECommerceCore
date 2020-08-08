@@ -6,7 +6,6 @@ using DevIO.App.ViewModels;
 using DevIO.Business.Interfaces;
 using AutoMapper;
 using DevIO.Business.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DevIO.App.Controllers
 {
