@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper;
+using DevIO.App.Configurations;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using DevIO.Data.Context;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DevIO.Data.Context;
-using AutoMapper;
-using DevIO.App.Configuration;
-using DevIO.App.Data;
 
 namespace DevIO.App
 {
@@ -14,39 +13,35 @@ namespace DevIO.App
     {
         public IConfiguration Configuration { get; }
 
-
-        public Startup(IHostingEnvironment hostingEnvironment)
+        public Startup(IHostingEnvironment hostEnvironment)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(hostingEnvironment.ContentRootPath)
+                .SetBasePath(hostEnvironment.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
+                .AddJsonFile($"appsettings.{hostEnvironment.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables();
 
-            if (hostingEnvironment.IsDevelopment())
+            if (hostEnvironment.IsDevelopment())
             {
                 builder.AddUserSecrets<Startup>();
             }
 
-
             Configuration = builder.Build();
         }
 
-
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddIdentityConfiguration(Configuration);
+
+            services.AddDbContext<ECommerceCoreDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddAutoMapper(typeof(Startup));
-
-            services.AddIdentityConfiguration(Configuration);
 
             services.AddMvcConfiguration();
 
             services.ResolveDependencies();
         }
-
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -57,7 +52,8 @@ namespace DevIO.App
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/erro/500");
+                app.UseStatusCodePagesWithRedirects("/erro/{0}");
                 app.UseHsts();
             }
 

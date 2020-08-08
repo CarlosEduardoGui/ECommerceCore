@@ -1,10 +1,7 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace DevIO.Business.Validations.Documents
+namespace DevIO.Business.Models.Validations.Documents
 {
     public class CpfValidacao
     {
@@ -14,8 +11,8 @@ namespace DevIO.Business.Validations.Documents
         {
             var cpfNumeros = Utils.ApenasNumeros(cpf);
 
-            if (!TamanhoValido(cpfNumeros)) return false;
-
+            if (!TamanhoValido(cpfNumeros))
+                return false;
             return !TemDigitosRepetidos(cpfNumeros) && TemDigitosValidos(cpfNumeros);
         }
 
@@ -39,18 +36,15 @@ namespace DevIO.Business.Validations.Documents
                 "88888888888",
                 "99999999999"
             };
-
             return invalidNumbers.Contains(valor);
         }
 
         private static bool TemDigitosValidos(string valor)
         {
             var number = valor.Substring(0, TamanhoCpf - 2);
-
             var digitoVerificador = new DigitoVerificador(number)
                 .ComMultiplicadoresDeAte(2, 11)
                 .Substituindo("0", 10, 11);
-
             var firstDigit = digitoVerificador.CalculaDigito();
             digitoVerificador.AddDigito(firstDigit);
             var secondDigit = digitoVerificador.CalculaDigito();
@@ -59,21 +53,20 @@ namespace DevIO.Business.Validations.Documents
         }
     }
 
-
     public class CnpjValidacao
     {
         public const int TamanhoCnpj = 14;
 
-        public static bool Validar(string cpf)
+        public static bool Validar(string cpnj)
         {
-            var cpfNumeros = Utils.ApenasNumeros(cpf);
+            var cnpjNumeros = Utils.ApenasNumeros(cpnj);
 
-            if (!TamanhoValido(cpfNumeros)) return false;
-
-            return !TemDigitosRepetidos(cpfNumeros) && TemDigitosValidos(cpfNumeros);
+            if (!TemTamanhoValido(cnpjNumeros))
+                return false;
+            return !TemDigitosRepetidos(cnpjNumeros) && TemDigitosValidos(cnpjNumeros);
         }
 
-        private static bool TamanhoValido(string valor)
+        private static bool TemTamanhoValido(string valor)
         {
             return valor.Length == TamanhoCnpj;
         }
@@ -93,7 +86,6 @@ namespace DevIO.Business.Validations.Documents
                 "88888888888888",
                 "99999999999999"
             };
-
             return invalidNumbers.Contains(valor);
         }
 
@@ -102,9 +94,8 @@ namespace DevIO.Business.Validations.Documents
             var number = valor.Substring(0, TamanhoCnpj - 2);
 
             var digitoVerificador = new DigitoVerificador(number)
-                .ComMultiplicadoresDeAte(2, 11)
+                .ComMultiplicadoresDeAte(2, 9)
                 .Substituindo("0", 10, 11);
-
             var firstDigit = digitoVerificador.CalculaDigito();
             digitoVerificador.AddDigito(firstDigit);
             var secondDigit = digitoVerificador.CalculaDigito();
@@ -126,11 +117,10 @@ namespace DevIO.Business.Validations.Documents
             _numero = numero;
         }
 
-        public DigitoVerificador ComMultiplicadoresDeAte(int primeiroMutiplicador, int ultimoMultiplcador)
+        public DigitoVerificador ComMultiplicadoresDeAte(int primeiroMultiplicador, int ultimoMultiplicador)
         {
             _multiplicadores.Clear();
-
-            for (int i = primeiroMutiplicador; i <= ultimoMultiplcador; i++)
+            for (var i = primeiroMultiplicador; i <= ultimoMultiplicador; i++)
                 _multiplicadores.Add(i);
 
             return this;
@@ -142,7 +132,6 @@ namespace DevIO.Business.Validations.Documents
             {
                 _substituicoes[i] = substituto;
             }
-
             return this;
         }
 
@@ -153,13 +142,19 @@ namespace DevIO.Business.Validations.Documents
 
         public string CalculaDigito()
         {
+            return !(_numero.Length > 0) ? "" : GetDigitSum();
+        }
+
+        private string GetDigitSum()
+        {
             var soma = 0;
             for (int i = _numero.Length - 1, m = 0; i >= 0; i--)
             {
                 var produto = (int)char.GetNumericValue(_numero[i]) * _multiplicadores[m];
                 soma += produto;
 
-                if (++m >= _multiplicadores.Count) m = 0;
+                if (++m >= _multiplicadores.Count)
+                    m = 0;
             }
 
             var mod = (soma % Modulo);
@@ -174,15 +169,14 @@ namespace DevIO.Business.Validations.Documents
         public static string ApenasNumeros(string valor)
         {
             var onlyNumber = "";
-
             foreach (var s in valor)
             {
                 if (char.IsDigit(s))
+                {
                     onlyNumber += s;
+                }
             }
-
             return onlyNumber.Trim();
         }
     }
-
 }

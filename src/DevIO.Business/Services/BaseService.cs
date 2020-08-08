@@ -1,19 +1,18 @@
-﻿using DevIO.Business.Models;
+﻿using DevIO.Business.Interfaces;
+using DevIO.Business.Models;
+using DevIO.Business.Notificacoes;
 using FluentValidation;
 using FluentValidation.Results;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DevIO.Business.Services
 {
     public abstract class BaseService
     {
-        protected void Notificar(string mensagem) 
+        private readonly INotificador _notificador;
+
+        protected BaseService(INotificador notificador)
         {
-            //Propagar esse erro até a camada de apresentação
-
-
+            _notificador = notificador;
         }
 
         protected void Notificar(ValidationResult validationResult)
@@ -24,6 +23,10 @@ namespace DevIO.Business.Services
             }
         }
 
+        protected void Notificar(string mensagem)
+        {
+            _notificador.Handle(new Notificacao(mensagem));
+        }
 
         protected bool ExecutarValidacao<TV, TE>(TV validacao, TE entidade) where TV : AbstractValidator<TE> where TE : Entity
         {

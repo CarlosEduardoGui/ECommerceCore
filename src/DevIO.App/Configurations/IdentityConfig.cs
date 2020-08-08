@@ -1,5 +1,4 @@
 ﻿using DevIO.App.Data;
-using DevIO.Data.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DevIO.App.Configuration
+namespace DevIO.App.Configurations
 {
     public static class IdentityConfig
     {
@@ -21,9 +20,8 @@ namespace DevIO.App.Configuration
             });
 
 
-            services.AddDbContext<ECommerceCoreDbContext>(options =>
-                options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)

@@ -12,15 +12,17 @@ namespace DevIO.App.Controllers
     public class FornecedoresController : BaseController
     {
         private readonly IFornecedorRepository _fornecedorRepository;
-        private readonly IEnderecoRepository _enderecoRepository;
+        private readonly IFornecedorService _fornecedorService;
         private readonly IMapper _mapper;
 
-
-        public FornecedoresController(IFornecedorRepository context, IMapper mapper, IEnderecoRepository endereco)
+        public FornecedoresController(IFornecedorRepository fornecedorRepository,
+                                      IMapper mapper,
+                                      IFornecedorService fornecedorService,
+                                      INotificador notificador) : base(notificador)
         {
-            _fornecedorRepository = context;
-            _enderecoRepository = endereco;
+            _fornecedorRepository = fornecedorRepository;
             _mapper = mapper;
+            _fornecedorService = fornecedorService;
         }
 
         [Route("lista-de-fornecedores")]
@@ -55,11 +57,12 @@ namespace DevIO.App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FornecedorViewModel fornecedorViewModel)
         {
-            if (!ModelState.IsValid) return View(fornecedorViewModel);
+            if (!ModelState.IsValid)
+                return View(fornecedorViewModel);
 
             var fornecedor = _mapper.Map<Fornecedor>(fornecedorViewModel);
 
-            await _fornecedorRepository.Adicionar(fornecedor);
+            await _fornecedorService.Adicionar(fornecedor);
 
             return RedirectToAction(nameof(Index));
 
@@ -83,14 +86,16 @@ namespace DevIO.App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, FornecedorViewModel fornecedorViewModel)
         {
-            if (id != fornecedorViewModel.Id) return NotFound();
+            if (id != fornecedorViewModel.Id)
+                return NotFound();
 
 
-            if (!ModelState.IsValid) return View(fornecedorViewModel);
+            if (!ModelState.IsValid)
+                return View(fornecedorViewModel);
 
             var fornecedor = _mapper.Map<Fornecedor>(fornecedorViewModel);
 
-            await _fornecedorRepository.Atualizar(fornecedor);
+            await _fornecedorService.Atualizar(fornecedor);
 
             return RedirectToAction(nameof(Index));
 
@@ -116,9 +121,10 @@ namespace DevIO.App.Controllers
         {
             var fornecedorViewModel = await ObterFornecedorEndereco(id);
 
-            if (fornecedorViewModel == null) return NotFound();
+            if (fornecedorViewModel == null)
+                return NotFound();
 
-            await _fornecedorRepository.Remover(id);
+            await _fornecedorService.Remover(id);
 
             return RedirectToAction(nameof(Index));
         }
@@ -128,7 +134,8 @@ namespace DevIO.App.Controllers
         {
             var fornecedor = await ObterFornecedorEndereco(id);
 
-            if (fornecedor == null) return NotFound();
+            if (fornecedor == null)
+                return NotFound();
 
             return PartialView("_AtualizarEnderecoPartial", new FornecedorViewModel { Endereco = fornecedor.Endereco });
         }
@@ -141,9 +148,10 @@ namespace DevIO.App.Controllers
             ModelState.Remove("Nome");
             ModelState.Remove("Documento");
 
-            if (!ModelState.IsValid) return PartialView("_AtualizarEnderecoPartial", fornecedorViewModel);
+            if (!ModelState.IsValid)
+                return PartialView("_AtualizarEnderecoPartial", fornecedorViewModel);
 
-            await _enderecoRepository.Atualizar(_mapper.Map<Endereco>(fornecedorViewModel.Endereco));
+            await _fornecedorService.AtualizarEndereco(_mapper.Map<Endereco>(fornecedorViewModel.Endereco));
 
             var url = Url.Action(nameof(ObterEndereco), "Fornecedores", new { id = fornecedorViewModel.Endereco.FornecedorId });
 
@@ -155,7 +163,8 @@ namespace DevIO.App.Controllers
         {
             var fornecedor = await ObterFornecedorEndereco(id);
 
-            if (fornecedor is null) return NotFound();
+            if (fornecedor is null)
+                return NotFound();
 
             return PartialView("_DetalhesEnderecoPartial", fornecedor);
         }
